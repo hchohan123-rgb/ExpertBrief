@@ -1,0 +1,4 @@
+# Railway deployment config for ExpertBrief (Vite + React static app)
+# Set in Railway dashboard: Build Command = npm run build, Start Command = npm start
+[build]
+builder = "nixpacks"
