@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { IconArrowRight, IconX } from '../components/Icons';
-import { supabase } from '../lib/supabase';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 const LandingPage: React.FC = () => {
   const [expertiseIndex, setExpertiseIndex] = useState(0);
@@ -37,8 +37,8 @@ const LandingPage: React.FC = () => {
     setFormState('submitting');
 
     try {
-      // Check if credentials are still the placeholders
-      if (supabase.supabaseUrl.includes('example.supabase.co')) {
+      // Check if Supabase is configured
+      if (!isSupabaseConfigured) {
         console.warn('Supabase credentials not configured. Simulating success.');
         // Simulate network delay
         await new Promise(resolve => setTimeout(resolve, 1500));
