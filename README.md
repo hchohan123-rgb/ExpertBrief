@@ -22,3 +22,14 @@ View your app in AI Studio: https://ai.studio/apps/drive/1gWx2BaVkpcyAy7-p9pe1Xi
    Get these from your Supabase project dashboard: Settings → API
 3. Run the app:
    `npm run dev`
+
+## Deploy on Railway
+
+Vite bakes `VITE_*` env vars **at build time**. If they're missing when Railway runs `npm run build`, the app can't reach Supabase.
+
+1. In your **Railway project** → **Variables**, add:
+   - `VITE_SUPABASE_URL` = your Supabase project URL (e.g. `https://xxxx.supabase.co`)
+   - `VITE_SUPABASE_ANON_KEY` = your Supabase anon/public key  
+   Get both from Supabase: **Settings → API**.
+
+2. **Redeploy** so the build runs with these variables (e.g. **Deploy** from the Railway dashboard or push a new commit). Do not rely on a previous build that ran without them.

@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { IconFolder, IconChevronRight, IconArrowLeft, IconUpload } from '../components/Icons';
 import { getFoldersByCase, type Folder } from '../lib/database';
-import { supabase } from '../lib/supabase';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 const FolderListPage: React.FC = () => {
   const [folders, setFolders] = useState<Folder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [errorDetail, setErrorDetail] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -18,8 +19,13 @@ const FolderListPage: React.FC = () => {
         setLoading(true);
         const data = await getFoldersByCase('mep-case-001');
         setFolders(data);
-      } catch (err) {
+      } catch (err: unknown) {
         console.error('Error loading folders:', err);
+        // #region agent log
+        const e = err as { message?: string; code?: string; name?: string };
+        if (typeof fetch !== 'undefined') fetch('http://127.0.0.1:7242/ingest/6e40aa55-1f21-4915-8f95-48a5c1d51167',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'pages/FolderListPage.tsx:loadFolders',message:'loadFolders catch',data:{errMessage:String(e?.message),errName:String(e?.name),errCode:e?.code},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3'})}).catch(()=>{});
+        // #endregion
+        setErrorDetail(e?.message ?? String(err));
         setError('Failed to load folders. Please check your Supabase setup.');
       } finally {
         setLoading(false);
@@ -97,6 +103,10 @@ const FolderListPage: React.FC = () => {
           <div className="bg-red-50 border border-red-200 rounded-sm p-6">
             <p className="text-red-600">{error}</p>
             <p className="text-sm text-[#4a4a4a] mt-2">Make sure you've run the SQL migration and added your Supabase anon key.</p>
+            <p className="text-xs text-slate-500 mt-3 font-mono" data-agent-diagnostic>
+              Diagnostic: Supabase configured = {isSupabaseConfigured ? 'yes' : 'no'}
+              {errorDetail ? ` · Error: ${errorDetail}` : ''}
+            </p>
           </div>
         </div>
       </div>

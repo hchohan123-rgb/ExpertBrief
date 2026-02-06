@@ -56,6 +56,9 @@ export async function getCaseBySlug(slug: string) {
 
 // Fetch folders for a case
 export async function getFoldersByCase(caseSlug: string) {
+  // #region agent log
+  if (typeof fetch !== 'undefined') fetch('http://127.0.0.1:7242/ingest/6e40aa55-1f21-4915-8f95-48a5c1d51167',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/database.ts:getFoldersByCase',message:'getFoldersByCase entry',data:{caseSlug},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3'})}).catch(()=>{});
+  // #endregion
   const { data, error } = await supabase
     .from('folders')
     .select(`
@@ -65,6 +68,9 @@ export async function getFoldersByCase(caseSlug: string) {
     .eq('cases.slug', caseSlug)
     .order('sort_order', { ascending: true });
 
+  // #region agent log
+  if (typeof fetch !== 'undefined') fetch('http://127.0.0.1:7242/ingest/6e40aa55-1f21-4915-8f95-48a5c1d51167',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/database.ts:getFoldersByCase',message:'getFoldersByCase result',data:{hasError:Boolean(error),errorMessage:error?.message,errorCode:error?.code,rowCount:data?.length},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3'})}).catch(()=>{});
+  // #endregion
   if (error) throw error;
   return data as Folder[];
 }
